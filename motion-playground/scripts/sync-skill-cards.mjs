@@ -52,7 +52,9 @@ function scanEffects() {
     const re = /export const (\w+Def)\s*:\s*EffectDef<[^>]*>\s*=\s*\{/g;
     let m;
     while ((m = re.exec(s))) {
-      const body = s.slice(m.index, m.index + 6000);
+      const nextExport = s.indexOf("\nexport const ", m.index + 10);
+      const bodyEnd = nextExport < 0 ? m.index + 6000 : Math.min(nextExport, m.index + 6000);
+      const body = s.slice(m.index, bodyEnd);
       const id = (body.match(/\bid:\s*"([a-z0-9-]+)"/) || [])[1];
       if (!id) continue;
       const desc = (body.match(/\bdescription:\s*"([^"]*)"/) || [])[1] || "";

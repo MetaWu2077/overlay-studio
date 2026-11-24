@@ -26,6 +26,14 @@ import { donutSplitDef } from "./hud/narrative/DonutSplit";
 import { waterfallBridgeDef } from "./hud/narrative/WaterfallBridge";
 import { radarProfileDef } from "./hud/narrative/RadarProfile";
 import { waffleFillDef } from "./hud/narrative/WaffleFill";
+import {
+  gaugeMeterDef,
+  highlighterDef,
+  inkUnderlineDef,
+  scanBracketDef,
+  strikeReplaceDef,
+  wordSlotDef,
+} from "./hud/TalkPort";
 import { withBreath } from "./breath";
 
 /** 按用途分组:同组内是"同一类需求的可选项",挑一张用即可 */
@@ -47,7 +55,7 @@ export const EFFECT_GROUPS: EffectGroup[] = [
   },
   {
     title: "数据指标",
-    effects: [ringMetricDef, odometerDef, rankBarsDef, growthCurveDef, growthBarsDef, donutSplitDef, waterfallBridgeDef, radarProfileDef, waffleFillDef],
+    effects: [ringMetricDef, odometerDef, rankBarsDef, growthCurveDef, growthBarsDef, donutSplitDef, waterfallBridgeDef, radarProfileDef, waffleFillDef, gaugeMeterDef],
   },
   {
     title: "对比取舍",
@@ -55,7 +63,7 @@ export const EFFECT_GROUPS: EffectGroup[] = [
   },
   {
     title: "金句观点",
-    effects: [quoteLockupDef, punchPillDef],
+    effects: [quoteLockupDef, punchPillDef, inkUnderlineDef, wordSlotDef, highlighterDef, strikeReplaceDef],
   },
   {
     title: "步骤流程",
@@ -63,7 +71,7 @@ export const EFFECT_GROUPS: EffectGroup[] = [
   },
   {
     title: "教程标注",
-    effects: [termCardDef, uiCalloutDef],
+    effects: [termCardDef, uiCalloutDef, scanBracketDef],
   },
   {
     title: "文字进场",

@@ -72,7 +72,7 @@ function scanCards() {
         while ((m = re.exec(src))) {
           const id = (src.slice(m.index, m.index + 400).match(/\bid:\s*"([a-z0-9-]+)"/) || [])[1];
           const blk = sliceDefaults(src, m.index);
-          if (id && blk) out.push({ id, file: path.relative(ROOT, p), text: blk.text });
+          if (id && blk) out.push({ id, file: path.relative(ROOT, p).split(path.sep).join("/"), text: blk.text });
         }
       }
     }

@@ -124,7 +124,7 @@ description: 特效生成——当用户提供 SRT 字幕文件(或带时间戳�
 
 - `dimAt`(秒,时间轴绝对时间):**讲过变浅+缩小**。到点后整卡压暗并缩小(幅度见【偏好·让位与压暗】,偏好表没给就用组件默认值),同 seg 顺排的卡缩放时(zoom 参与布局,下方内容自动上移补位,不会被挤出屏幕),但不退场;整个话题结束才用 `end` 退场。`dimMode` 可选让位方式:`both`(默认,变浅+缩小)/`fade`(只变浅)/`shrink`(只缩小),一般不用填。编排时给每张证据/论点卡都填:值 = 下一个话题开始的秒数。这是"组合感"的关键——旧信息在场但让位,观众随时能回看已讲过的论据。
 
-## 卡片库(25 种,只能用这些 kind)
+## 卡片库(31 种,只能用这些 kind)
 
 <!-- CARDS:AUTO-BEGIN 由 `npm run sync:cards` 从 registry.ts 生成。
      新增卡片后跑一次,表里会自动多一行;「触发条件」列写着「⬜ 待补」的需要人工补一句。
@@ -154,6 +154,7 @@ description: 特效生成——当用户提供 SRT 字幕文件(或带时间戳�
 | `waterfall-bridge` | 瀑布图 · 起点柱升起,增项砸下、减项抽走,终点柱发光弹出总变化 | 「从 100 到 120,中间发生了什么」「增加了这些,又被这些吃掉了」;拆解增减过程,最多 6 步 | `kickerEn`/`kickerZh`、`title`、`start`(`名称:数值`)、`steps`(一行一步`名称:+数值/-数值`,最多 6 步)、`endLabel`、`unit`、`times`(起点柱\|终点柱)、`stepTimes`、`position` |
 | `radar-profile` | 雷达画像 · 网格展开,主对象多边形长出、可叠对比对象并标出差距最大轴 | 「强在哪、差在哪,一张图看清」「跟对手比这一项差了 30 分」;3–10 个维度对比 | `kickerEn`/`kickerZh`、`title`、`axes`(维度名`\|`分隔,3–10 个)、`nameA`/`valuesA`、`nameB`/`valuesB`(可空)、`max`、`times`(主对象\|对比\|差距轴)、`position` |
 | `waffle-fill` | 百格华夫 · 10×10 方格按类别灌满,图例数字滚动,灌完可聚焦一类 | 「每 100 个人里有 38 个是这样」「超过三分之一属于这一类」;2–8 类占比直观呈现 | `kickerEn`/`kickerZh`、`title`、`items`(一行一类`名称:数值`,2–8 类)、`unit`、`focus`(聚焦第几类,0=不聚焦)、`times`(开始灌\|聚焦)、`position` |
+| `gauge-meter` | 仪表读数 · 半圆刻度针转到目标数 | 念到一个有满刻度的比例，针转到那个数；同一个数已经用了圆环或翻牌就别再叠这张 | `value`、`max`、`unit`、`label`、`position`(left/right)、`accent`、`offsetX`/`offsetY` |
 
 ### 对比取舍(两个东西对撞/否定一个立一个)
 | kind | 用途 | 触发条件 | 关键 params |
@@ -165,6 +166,10 @@ description: 特效生成——当用户提供 SRT 字幕文件(或带时间戳�
 |---|---|---|---|
 | `quote-lockup` | 金句定格卡 | 多行金句逐行揭示(毛玻璃卡) | `quote`(`\|`分行)、`author`、`accent`(默认blue)、`side`(left/right) |
 | `punch-pill` | 金句药丸 | 短金句/设问定格:"你怎么选?" | `text`、`position`(bottom/top-left/top-right) |
+| `ink-underline` | 墨迹下划线 · 关键词下方一条线跟着念画出来 | 口播点名一个词，线跟着这个词画出来 | `text`、`position`(left/right/top)、`accent`、`offsetX`/`offsetY` |
+| `word-slot` | 词槽轮换 · 同一个药丸里按台词换成下一个词 | 同一句里连续换几个说法，药丸按台词逐个换，停在最后一个 | `words`(竖线分隔)、`stepMs`、`position`(top/left/right)、`accent`、`offsetX`/`offsetY` |
+| `highlighter-sweep` | 荧光笔扫过 · 半透明色块从左扫过这一句 | 一句里要标重点，色块从左扫过这句 | `text`、`position`(top/left/right)、`accent`、`offsetX`/`offsetY` |
+| `strike-replace` | 划词替换 · 旧说法划掉，新说法从下面顶上来 | 先否定旧说法再换成新说法：旧的划掉，新的顶上来 | `before`、`after`、`position`(left/right/center)、`accent`、`offsetX`/`offsetY` |
 
 ### 步骤流程(有先后顺序的过程)
 | kind | 用途 | 触发条件 | 关键 params |
@@ -177,6 +182,7 @@ description: 特效生成——当用户提供 SRT 字幕文件(或带时间戳�
 |---|---|---|---|
 | `term-card` | 术语解释卡 | 出现术语要解释:Plan模式、MVP… | `en`(英文)、`term`、`def`(一句话定义)、`position`(left/right) |
 | `ui-callout` | 界面标注 | 讲解界面某区域:"项目入口在这里" | `label`、`ringW`/`ringH`(圈大小)、`side`、`offsetX`/`offsetY`(挪到目标位置) |
+| `scan-bracket` | 扫描角框 · 四角收拢，框住这一句 | 要把视线收到某一句，四角框收拢；不要拿它当全屏运镜 | `label`、`position`(left/right/center)、`accent`、`offsetX`/`offsetY` |
 
 ### 文字进场(纯文字的进场方式,内容轻时用)
 | kind | 用途 | 触发条件 | 关键 params |

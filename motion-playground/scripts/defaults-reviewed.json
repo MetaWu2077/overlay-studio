@@ -27,6 +27,10 @@
     "hash": "e1f7f4ddf78b",
     "file": "src/effects/hud/FocusCard.tsx"
   },
+  "gauge-meter": {
+    "hash": "96801e4dc7c5",
+    "file": "src/effects/hud/TalkPort.tsx"
+  },
   "growth-bars": {
     "hash": "a2536060ede9",
     "file": "src/effects/hud/narrative/GrowthBars.tsx"
@@ -34,6 +38,14 @@
   "growth-curve": {
     "hash": "8b4948ec3561",
     "file": "src/effects/hud/GrowthCurve.tsx"
+  },
+  "highlighter-sweep": {
+    "hash": "6474cac5a181",
+    "file": "src/effects/hud/TalkPort.tsx"
+  },
+  "ink-underline": {
+    "hash": "061724a2e233",
+    "file": "src/effects/hud/TalkPort.tsx"
   },
   "odometer": {
     "hash": "c32549c9352b",
@@ -63,6 +75,10 @@
     "hash": "6f3638292a4f",
     "file": "src/effects/hud/RingMetric.tsx"
   },
+  "scan-bracket": {
+    "hash": "0f9a3c1cda63",
+    "file": "src/effects/hud/TalkPort.tsx"
+  },
   "stat-proof": {
     "hash": "0578b9ebba86",
     "file": "src/effects/hud/StatProof.tsx"
@@ -70,6 +86,10 @@
   "step-timeline": {
     "hash": "ebf8839e51c0",
     "file": "src/effects/hud/StepTimeline.tsx"
+  },
+  "strike-replace": {
+    "hash": "2e7797747c7c",
+    "file": "src/effects/hud/TalkPort.tsx"
   },
   "term-card": {
     "hash": "a058f7ed8735",
@@ -98,5 +118,9 @@
   "waterfall-bridge": {
     "hash": "2d3913abfa0f",
     "file": "src/effects/hud/narrative/WaterfallBridge.tsx"
+  },
+  "word-slot": {
+    "hash": "4a71eec5f383",
+    "file": "src/effects/hud/TalkPort.tsx"
   }
 }

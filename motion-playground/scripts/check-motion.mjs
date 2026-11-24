@@ -69,7 +69,7 @@ function ownerOf(lines, i, isCss) {
 function scan() {
   const hits = [];
   for (const file of walk(SRC)) {
-    const rel = path.relative(ROOT, file);
+    const rel = path.relative(ROOT, file).split(path.sep).join("/");
     const isCss = file.endsWith(".css");
     const lines = fs.readFileSync(file, "utf8").split("\n");
     lines.forEach((raw, i) => {
