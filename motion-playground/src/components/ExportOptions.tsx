@@ -9,21 +9,18 @@ interface ExportOptionsProps {
   onFastPng: (fast: boolean) => void;
   parallelFrames: boolean;
   onParallelFrames: (enabled: boolean) => void;
-  sharpText: boolean;
-  onSharpText: (enabled: boolean) => void;
   streaming: boolean;
   onStreaming: (enabled: boolean) => void;
   disabled: boolean;
 }
 
 /** Shared by timeline and single-card exports; MOV is always included. */
-export function ExportOptions({ includeWebm, onIncludeWebm, compatibilityMode, onCompatibilityMode, fastPng, onFastPng, streaming, onStreaming, parallelFrames, onParallelFrames, sharpText, onSharpText, disabled }: ExportOptionsProps) {
+export function ExportOptions({ includeWebm, onIncludeWebm, compatibilityMode, onCompatibilityMode, fastPng, onFastPng, streaming, onStreaming, parallelFrames, onParallelFrames, disabled }: ExportOptionsProps) {
   const webmDescription = useId();
   const compatibilityDescription = useId();
   const fastDescription = useId();
   const streamDescription = useId();
   const parallelDescription = useId();
-  const sharpDescription = useId();
   return (
     <fieldset className="export-options" disabled={disabled}>
       <legend>导出设置</legend>
@@ -59,27 +56,8 @@ export function ExportOptions({ includeWebm, onIncludeWebm, compatibilityMode, o
             <span className="export-option-state">{compatibilityMode ? "已开启" : "已关闭"}</span>
           </span>
           <span className="export-option-description" id={compatibilityDescription}>
-            Windows 上默认的显卡绘制会让每一帧截图要一秒多。打开后改用更快的绘制，成片尺寸不变。
-            <span className="export-option-cost">仅 Windows 生效。画面异常时关掉再导一次。</span>
-          </span>
-        </span>
-      </label>
-      <label className="export-option">
-        <input
-          type="checkbox"
-          aria-label="小字更清晰"
-          aria-describedby={sharpDescription}
-          checked={sharpText}
-          onChange={(event) => onSharpText(event.target.checked)}
-        />
-        <span className="export-option-content">
-          <span className="export-option-heading">
-            <strong>小字更清晰</strong>
-            <span className="export-option-state">{sharpText ? "已开启" : "已关闭"}</span>
-          </span>
-          <span className="export-option-description" id={sharpDescription}>
-            按两倍大小绘制，再缩回成片尺寸。章节条这类小字边缘会干净一些。
-            <span className="export-option-cost">比普通清晰度多花一些时间。成片仍是原来的宽高。</span>
+            截图会快很多，但文字边缘会发软，不能当清晰成片。要原来的清晰度就保持关闭。
+            <span className="export-option-cost">仅 Windows 生效。</span>
           </span>
         </span>
       </label>
