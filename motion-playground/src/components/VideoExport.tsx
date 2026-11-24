@@ -17,6 +17,7 @@ type Job = {
   outputs: string[];
   fastPng: boolean;
   compatibilityMode: boolean;
+  supersample: 1 | 2;
   parallelFrames: boolean;
   exportMode: "stream" | "sequence";
 };
@@ -80,7 +81,11 @@ export function VideoExport(props: Props) {
   const [fps, setFps] = useState(props.document?.exportFps ?? 29.97);
   const [webm, setWebm] = useState(false),
     [fastPng, setFastPng] = useState(false);
-  const [compat, setCompat] = useState(() => stored("overlayStudioExportCompatibilityMode") === "1");
+  const savedCompat = stored("overlayStudioExportCompatibilityMode");
+  const [compat, setCompat] = useState(
+    () => savedCompat === "1" || (savedCompat !== "0" && /Win/i.test(navigator.platform)),
+  );
+  const [sharpText, setSharpText] = useState(() => stored("overlayStudioExportSupersample") !== "0");
   const [parallel, setParallel] = useState(false),
     [streaming, setStreaming] = useState(false);
   const [folderBusy, setFolderBusy] = useState(false),
@@ -244,6 +249,7 @@ export function VideoExport(props: Props) {
         outputs: webm ? ["mov", "webm"] : ["mov"],
         fastPng,
         compatibilityMode: compat,
+        supersample: sharpText ? 2 : 1,
         parallelFrames: parallel,
         exportMode: streaming ? "stream" : "sequence",
       };
@@ -319,6 +325,11 @@ export function VideoExport(props: Props) {
               onCompatibilityMode={(v) => {
                 setCompat(v);
                 remember("overlayStudioExportCompatibilityMode", v ? "1" : "0");
+              }}
+              sharpText={sharpText}
+              onSharpText={(v) => {
+                setSharpText(v);
+                remember("overlayStudioExportSupersample", v ? "1" : "0");
               }}
               fastPng={fastPng}
               onFastPng={setFastPng}

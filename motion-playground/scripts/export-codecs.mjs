@@ -1,5 +1,5 @@
 /** Identical codec parameters for PNG files and the PNG stdin transport. */
-export function videoOutputArgs(format, file, audioFile) {
+export function videoOutputArgs(format, file, audioFile, frameSize) {
   if (format === "mov") return [
     // Preserve the published PCM-in-MOV compatibility choice; do not truncate its tail with -shortest.
     ...(audioFile ? ["-map", "0:v:0", "-map", "1:a:0", "-c:a", "pcm_s16le"] : []),
@@ -18,7 +18,7 @@ export function videoOutputArgs(format, file, audioFile) {
     //   较实            4.93 / 2.97
     // 每一档都是预乘模型胜。不预乘的后果:全透明区的 RGB 是近白垃圾值,
     // 会被直接加进画面，导致羽化边缘出现白环。
-    "-vf", "premultiply=inplace=1",
+    "-vf", `${frameSize ? `scale=${frameSize.w}:${frameSize.h}:flags=lanczos,` : ""}premultiply=inplace=1`,
     "-c:v", "prores_ks", "-profile:v", "4444", "-pix_fmt", "yuva444p10le", "-vendor", "apl0",
     // 色彩空间标记:不写的话 ffprobe 三项都是 unknown,剪映只能猜,
     // 猜错就整条偏色(实测:导进剪映后整条颜色不对)。原片是 bt709,对齐它。

@@ -31,6 +31,13 @@ export function resolveExportMode(value, keepFrames = false) {
   return keepFrames ? "sequence" : (value ?? "sequence");
 }
 
+/** 1 keeps the stage pixel size. 2 draws twice as large and the encoder scales back. */
+export function resolveSupersample(value) {
+  if (value === undefined) return 1;
+  if (value !== 1 && value !== 2) throw new Error("supersample 必须是 1 或 2");
+  return value;
+}
+
 /** Windows renderer workaround; omitted jobs preserve the default backend. */
 export function resolveCompatibilityMode(value) {
   if (value === undefined) return false;

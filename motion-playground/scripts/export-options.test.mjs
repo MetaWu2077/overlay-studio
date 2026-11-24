@@ -5,7 +5,7 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
-import { resolveExportOutputs, resolveFastPng, resolveCompatibilityMode } from "./export-options.mjs";
+import { resolveExportOutputs, resolveFastPng, resolveCompatibilityMode, resolveSupersample } from "./export-options.mjs";
 import { captureExportFrame } from "./capture-export-frame.mjs";
 
 test("omitted CLI outputs retain MOV + WebM; explicit MOV avoids the optional format", () => {
@@ -83,6 +83,15 @@ test("CLI rejects invalid outputs before launching Chrome or creating exports", 
     assert.deepEqual(after, before);
   } finally {
     fs.rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test("supersample stays at the stage size unless 2 is explicit", () => {
+  assert.equal(resolveSupersample(undefined), 1);
+  assert.equal(resolveSupersample(1), 1);
+  assert.equal(resolveSupersample(2), 2);
+  for (const value of [null, 0, 3, 1.5, "2", true]) {
+    assert.throws(() => resolveSupersample(value), /supersample/);
   }
 });
 

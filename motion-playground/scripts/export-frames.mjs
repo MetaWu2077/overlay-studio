@@ -18,7 +18,7 @@ import { exportBrowserOptions, exportBrowserDiagnostics } from "./export-browser
 import { cameraSeekStart } from "./video-frame-seek.mjs";
 import { cameraFrameRanges, rangeCacheSuffix, rangeFilter } from "./video-frame-ranges.mjs";
 import { closeBrowser } from "./export-lifecycle.mjs";
-import { resolveExportOutputs, resolveFastPng, resolveExportMode, resolveCompatibilityMode } from "./export-options.mjs";
+import { resolveExportOutputs, resolveFastPng, resolveExportMode, resolveCompatibilityMode, resolveSupersample } from "./export-options.mjs";
 import { prepareSfxMix, recordBakedSfx } from "./export-sfx.mjs";
 import { videoAudioInputArgs, videoOutputArgs } from "./export-codecs.mjs";
 import { createPngStream } from "./png-stream.mjs";
@@ -43,6 +43,7 @@ job.mode ??= job.doc ? "timeline" : "single";
 let outputs;
 let fastPng;
 let compatibilityMode;
+let supersample = 1;
 let exportMode;
 let renderConcurrency;
 try {
@@ -50,6 +51,7 @@ try {
   outputs = resolveExportOutputs(job.outputs);
   fastPng = resolveFastPng(job.fastPng);
   compatibilityMode = resolveCompatibilityMode(job.compatibilityMode);
+  supersample = resolveSupersample(job.supersample);
   exportMode = resolveExportMode(job.exportMode, job.keepFrames);
   if (!["single", "timeline"].includes(job.mode) ||
     (job.mode === "single" && !/^[a-z0-9][a-z0-9-]*$/.test(job.effectId ?? "")))
@@ -96,7 +98,7 @@ function freeBytes(dir) {
   }
 }
 // 14/29 是 30fps 的经验值,50/60 帧的 PNG 和 ProRes 都按帧数等比放大
-const needBytes = duration * (14 + 29) * (FPS / 30) * 1024 * 1024 + 2 * 1024 ** 3;
+const needBytes = duration * (14 * supersample * supersample + 29) * (FPS / 30) * 1024 * 1024 + 2 * 1024 ** 3;
 const gb = (n) => (n / 1024 ** 3).toFixed(1);
 // An occupied file on Windows must not replace the original export failure.
 function cleanupPartial(target, recursive = false) {
@@ -324,7 +326,8 @@ try {
   console.log(JSON.stringify({ event: "export-browser", ...renderer }));
   const hasFfmpeg = spawnSync("ffmpeg", ["-version"], { stdio: "ignore", timeout: 10_000, windowsHide: true }).status === 0;
   if (streaming && !hasFfmpeg) throw new Error("流式导出需要 FFmpeg，请安装后重试，或关闭流式导出以保留 PNG 序列");
-  result = { ok: true, dir: streaming ? null : outDir, frames: totalFrames, fps, outputs, fastPng, renderer, exportMode, renderConcurrency, mov: null, webm: null };
+  const frameSize = supersample > 1 ? STAGE : undefined;
+  result = { ok: true, dir: streaming ? null : outDir, frames: totalFrames, fps, outputs, fastPng, supersample, renderer, exportMode, renderConcurrency, mov: null, webm: null };
   const soundCards = mode === 'timeline'
     ? (doc?.cards??[]).filter(c=>doc.captionsVisible!==false || c.kind!=='caption-track')
     : [{kind:effectId,start:0,end:duration,params}];
@@ -353,7 +356,7 @@ try {
       });
       void _r;
     });
-    await page.setViewport({ width: STAGE.w, height: STAGE.h, deviceScaleFactor: 1 });
+    await page.setViewport({ width: STAGE.w, height: STAGE.h, deviceScaleFactor: supersample });
     const client = await page.createCDPSession();
 
     // 记录页面里的 JS 报错,失败时给出人话原因
@@ -428,7 +431,7 @@ try {
     console.log("streaming PNG frames to video encoders...");
     pngStream = createPngStream({
       files: Object.fromEntries(outputs.map((format) => [format, path.join(finalDir, `${name}-${stamp}.${format}`)])),
-      fps: FPS_ARG, durationSec: duration, totalFrames, audioFile: preparedSfx?.mixFile,
+      fps: FPS_ARG, durationSec: duration, totalFrames, audioFile: preparedSfx?.mixFile, frameSize,
       onProgress(format, event) {
         if (result.streamStats.firstEncodedAtFrame === null && event.frame > 0)
           result.streamStats.firstEncodedAtFrame = submitted;
@@ -503,7 +506,7 @@ try {
     const r1 = await runFfmpeg(
       ["-y", "-framerate", FPS_ARG, "-i", seq,
         ...videoAudioInputArgs("mov", preparedSfx?.mixFile),
-        ...videoOutputArgs("mov", mov, preparedSfx?.mixFile)],
+        ...videoOutputArgs("mov", mov, preparedSfx?.mixFile, frameSize)],
       { stage: "mov", durationSec: duration, total: totalFrames },
     );
     if (r1.status === 0 && fs.existsSync(mov)) {
@@ -519,7 +522,7 @@ try {
       const webm = path.join(finalDir, `${name}-${stamp}.webm`);
       const r2 = await runFfmpeg(
         ["-y", "-framerate", FPS_ARG, "-i", seq,
-          ...videoOutputArgs("webm", webm)],
+          ...videoOutputArgs("webm", webm, undefined, frameSize)],
         { stage: "webm", durationSec: duration, total: totalFrames },
       );
       if (r2.status === 0 && fs.existsSync(webm)) result.webm = webm;

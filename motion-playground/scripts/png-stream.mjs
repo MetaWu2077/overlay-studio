@@ -3,7 +3,7 @@ import { startFfmpeg, ffmpegFailure } from "./ffmpeg-process.mjs";
 import { videoAudioInputArgs, videoOutputArgs } from "./export-codecs.mjs";
 
 /** One PNG in flight per encoder; each write waits for the OS pipe to accept it. */
-export function createPngStream({ files, fps, durationSec, totalFrames, onProgress, audioFile,
+export function createPngStream({ files, fps, durationSec, totalFrames, onProgress, audioFile, frameSize,
   processOptions = {}, onCleanupError = (error) => console.error(error.message) }) {
   const outputs = {};
   let busy = false;
@@ -13,7 +13,7 @@ export function createPngStream({ files, fps, durationSec, totalFrames, onProgre
     const process = startFfmpeg([
       "-y", "-probesize", "32", "-analyzeduration", "0", "-f", "image2pipe", "-c:v", "png", "-framerate", String(fps), "-i", "pipe:0",
       ...videoAudioInputArgs(format, audioFile),
-      ...videoOutputArgs(format, file, audioFile),
+      ...videoOutputArgs(format, file, audioFile, frameSize),
     ], { ...processOptions, pipeInput: true, stage: format, durationSec, total: totalFrames,
       onProgress: (event) => onProgress?.(format, event) });
     const sink = { format, file, process, result: null, error: null, rejectWrite: null, frames: 0 };
